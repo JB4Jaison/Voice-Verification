@@ -19,6 +19,6 @@
             app:popupTheme="@style/Theme.VoiceVerification.PopupOverlay" />
 
     </com.google.android.material.appbar.AppBarLayout>
-    
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
