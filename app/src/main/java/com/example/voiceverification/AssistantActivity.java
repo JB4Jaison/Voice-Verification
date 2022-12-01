@@ -1,26 +1,37 @@
 package com.example.voiceverification;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AssistantActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
     TextView speechResults;
     ImageButton voiceButton;
-
-
+    ListView superListView;
+    JsonObject poolConfigJson;
+    JsonObject taskDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +46,12 @@ public class AssistantActivity extends AppCompatActivity {
 
             }
         });
+
+        superListView = findViewById(R.id.superListView);
+
+        poolConfigJson = new JsonObject();
+        taskDetails = new JsonObject();
+//        getSuperHeroes();
 
     }
 
@@ -63,10 +80,185 @@ public class AssistantActivity extends AppCompatActivity {
                     // Get the text from the voice intent
                     ArrayList <String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     // Displaying the result on the TextView
-                    speechResults.setText(result.get(0));
+                    String input = result.get(0);
+                    speechResults.setText(input);
+                    postTask(input);
+//                    // Getting the audio
+//                    Uri audioUri = data.getData();
+//                    ContentResolver contentResolver = getContentResolver();
+//                    try {
+//                        InputStream filestream = contentResolver.openInputStream(audioUri);
+//                        Toast.makeText( this, "audio" + "uri= "+ audioUri, Toast.LENGTH_LONG).show();
+//                    } catch (FileNotFoundException e) {
+//                        Toast.makeText( this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
+//                    }
+//                     TODO: read audio file from inputstream
+
                 }
                 break;
             }
         }
+
     }
+
+    private void postTask(String input) {
+        JsonObject taskDetails = new JsonObject();
+
+        taskDetails.addProperty("pool_id", "36641344");
+        taskDetails.addProperty("overlap", 3);
+
+        String json = "{\n" +
+                "    \"headline\": \"" + input + "\"\n" +
+                "    }";
+
+        JsonObject inputDetails = new Gson().fromJson(json, JsonObject.class);
+        taskDetails.add("input_values", inputDetails);
+
+        Log.i("Display", taskDetails.toString());
+
+        Call<List<TaskCreationResults>> call = RetrofitClient.getInstance("task").getTasksApi().sendTask(taskDetails);
+
+        call.enqueue(new Callback<List<TaskCreationResults>>() {
+            @Override
+            public void onResponse(Call<List<TaskCreationResults>> call, Response<List<TaskCreationResults>> response) {
+                List<TaskCreationResults> myheroList = response.body();
+                Log.i("Err", String.valueOf(myheroList));
+
+                String[] oneHeroes = new String[myheroList.size()];
+                Log.i("Pool Id", myheroList.get(0).getId());
+
+            }
+
+            @Override
+            public void onFailure(Call<List<TaskCreationResults>> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "An error has occured", Toast.LENGTH_LONG).show();
+//                Log.i("Err", call[0].toString());
+            }
+
+        });
+
+
+        return ;
+    }
+
+    private void getSuperHeroes() {
+//        poolConfigJson = getPoolConfigjson(121958);
+//        Log.i("Display", poolConfigJson.toString());
+//        Call<List<PoolResults>> call = RetrofitClient.getInstance().getPostApi().sendPool(poolConfigJson);
+        Call<List<Results>> call = RetrofitClient.getInstance("test").getMyApi().getsuperHeroes();
+        call.enqueue(new Callback<List<Results>>() {
+            @Override
+            public void onResponse(Call<List<Results>> call, Response<List<Results>> response) {
+                    List<Results> myheroList = response.body();
+                    Log.i("Err", response.body().toString());
+                    Log.i("Err2", String.valueOf(myheroList));
+                    String[] oneHeroes = new String[myheroList.size()];
+                    Log.i("Pool Id", myheroList.get(0).getName());
+//                    for (int i = 0; i < myheroList.size(); i++) {
+//                        oneHeroes[i] = myheroList.get(i).getName();
+//                    }
+//
+//                    superListView.setAdapter(new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, oneHeroes));
+
+            }
+
+            @Override
+            public void onFailure(Call<List<Results>> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "An error has occured", Toast.LENGTH_LONG).show();
+//                Log.i("Err", call[0].toString());
+            }
+
+        });
+    }
+
+    private JsonObject getPoolConfigjson(int pid) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("project_id", pid);
+        jsonObject.addProperty("private_name", "Text Correction Pool 1");
+        jsonObject.addProperty("may_contain_adult_content", true);
+//        jsonObject.addProperty("will_expire", "<close date>");
+        jsonObject.addProperty("reward_per_assignment", 0.02);
+        jsonObject.addProperty("assignment_max_duration_seconds", 60);
+        jsonObject.addProperty("project_id", pid);
+
+        String json = "{\n" +
+                "    \"and\": [\n" +
+                "      {\n" +
+                "        \"or\": [\n" +
+                "          {\n" +
+                "            \"category\": \"profile\",\n" +
+                "            \"key\": \"languages\",\n" +
+                "            \"operator\": \"IN\",\n" +
+                "            \"value\": \"EN\"\n" +
+                "          }\n" +
+                "        ]\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }";
+
+        JsonObject filterConfig = new Gson().fromJson(json, JsonObject.class);
+        jsonObject.add("filter", filterConfig);
+
+        json = "{\n" +
+                "    \"captcha_frequency\": \"LOW\",\n" +
+                "    \"configs\": [\n" +
+                "      {\n" +
+                "        \"collector_config\": {\n" +
+                "          \"type\": \"CAPTCHA\",\n" +
+                "          \"parameters\": {\n" +
+                "            \"history_size\": 10\n" +
+                "          }\n" +
+                "        },\n" +
+                "        \"rules\": [\n" +
+                "          {\n" +
+                "            \"conditions\": [\n" +
+                "              {\n" +
+                "                \"key\": \"stored_results_count\",\n" +
+                "                \"operator\": \"EQ\",\n" +
+                "                \"value\": 10\n" +
+                "              },\n" +
+                "              {\n" +
+                "                \"key\": \"success_rate\",\n" +
+                "                \"operator\": \"LTE\",\n" +
+                "                \"value\": 70\n" +
+                "              }\n" +
+                "            ],\n" +
+                "            \"action\": {\n" +
+                "              \"type\": \"RESTRICTION_V2\",\n" +
+                "              \"parameters\": {\n" +
+                "                \"scope\": \"PROJECT\",\n" +
+                "                \"duration_unit\": \"DAYS\",\n" +
+                "                \"duration\": 3,\n" +
+                "                \"private_comment\": \"Incorrect captcha input\"\n" +
+                "              }\n" +
+                "            }\n" +
+                "          }\n" +
+                "        ]\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }";
+
+        JsonObject qualityConfig = new Gson().fromJson(json, JsonObject.class);
+        jsonObject.add("quality_control", qualityConfig);
+
+        json = "{\n" +
+                "    \"real_tasks_count\": 3,\n" +
+                "    \"golden_tasks_count\": 0,\n" +
+                "    \"training_tasks_count\": 0\n" +
+                "  }";
+
+        JsonObject mixerConfig = new Gson().fromJson(json, JsonObject.class);
+        jsonObject.add("mixer_config", mixerConfig);
+
+        json = "{\n" +
+                "    \"default_overlap_for_new_task_suites\": 3\n" +
+                "  }";
+
+        JsonObject defaultsConfig = new Gson().fromJson(json, JsonObject.class);
+        jsonObject.add("defaults", defaultsConfig);
+
+        return jsonObject;
+    }
+
+
 }
