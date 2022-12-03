@@ -2,8 +2,6 @@ package com.example.voiceverification;
 
 import com.google.gson.JsonObject;
 
-import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Headers;
@@ -18,6 +16,6 @@ public interface PostTasksAPI {
             "Content-Type: application/JSON"
     })
     @POST("api/v1/tasks")
-    Call<List<TaskCreationResults>> sendTask(@Body JsonObject taskDetails);
+    Call<TaskCreationResults> sendTask(@Body JsonObject taskDetails);
 
 }

@@ -11,6 +11,7 @@ public class RetrofitClient {
     private Api myApi;
     private PostPoolAPI papi;
     private PostTasksAPI tapi;
+    private GetTaskResultsAPI rapi;
 
     private RetrofitClient(String type) {
 
@@ -46,6 +47,13 @@ public class RetrofitClient {
                         .build();
                 papi = retrofit.create(PostPoolAPI.class);
                 break;
+            case ("result"):
+                retrofit = new Retrofit.Builder().baseUrl(GetTaskResultsAPI.BASE_URL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .client(httpClient.build())
+                        .build();
+                rapi = retrofit.create(GetTaskResultsAPI.class);
+                break;
         }
 
     }
@@ -67,5 +75,9 @@ public class RetrofitClient {
 
     public PostTasksAPI getTasksApi() {
         return tapi;
+    }
+
+    public GetTaskResultsAPI getTaskResultApi() {
+        return rapi;
     }
 }

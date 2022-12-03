@@ -1,7 +1,11 @@
 package com.example.voiceverification;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.StrictMode;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.View;
@@ -14,11 +18,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,6 +38,8 @@ public class AssistantActivity extends AppCompatActivity {
     ListView superListView;
     JsonObject poolConfigJson;
     JsonObject taskDetails;
+    String taskId;
+    final Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,20 +55,27 @@ public class AssistantActivity extends AppCompatActivity {
             }
         });
 
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         superListView = findViewById(R.id.superListView);
 
         poolConfigJson = new JsonObject();
         taskDetails = new JsonObject();
+        taskId = "";
 //        getSuperHeroes();
 
     }
 
     private void speak() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "What would you want me to do today?");
+//        intent.putExtra("android.speech.extra.GET_AUDIO_FORMAT", "audio/AMR");
+//        intent.putExtra("android.speech.extra.GET_AUDIO", true);
 
         try {
             //Shows the dialog box
@@ -82,13 +97,70 @@ public class AssistantActivity extends AppCompatActivity {
                     // Displaying the result on the TextView
                     String input = result.get(0);
                     speechResults.setText(input);
-                    postTask(input);
-//                    // Getting the audio
-//                    Uri audioUri = data.getData();
+
+                    Log.i("Pre Pool Id", taskId);
+                    String postedTaskId = "00022f999b--638b7e4f6802550c5df5cff1";
+//                    postedTaskId = postTask(input);
+                    Log.i("Posted Task Id", postedTaskId);
+
+//                    if (!taskId.equals("")){
+//
+//                    } else{
+//                        Toast.makeText(getApplicationContext(), "Task was not successfully created", Toast.LENGTH_LONG).show();
+//                    }
+//                    getTaskResults(postedTaskId);
+//                    ArrayList<String> answers = getTaskResults(postedTaskId);
+
+//                    String finalPostedTaskId = postedTaskId;
+
+
+//                    handler.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            ArrayList<String> answers = getTaskResults(finalPostedTaskId);
+////                            ArrayList<String> answers = getTaskResults("00022f999b--638b7e4f6802550c5df5cff1");
+//                            Log.i("List of Answers", answers.toString());
+//                            superListView.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, answers));
+//                        }
+//                    }, 70000);
+
+//                    new CountDownTimer(70000, 20000) {
+//                        public void onFinish() {
+//                            ArrayList<String> answers = getTaskResults(finalPostedTaskId);
+////                            ArrayList<String> answers = getTaskResults("00022f999b--638b7e4f6802550c5df5cff1");
+//                            Log.i("List of Answers", answers.toString());
+//                            superListView.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, answers));
+//                        }
+//
+//                        public void onTick(long millisUntilFinished) {
+////                            if (millisUntilFinished == 30000){
+//                                Toast.makeText(getApplicationContext(), "Please wait as we fetch the results", Toast.LENGTH_LONG).show();
+////                            }
+//                        }
+//                    }.start();
+
+                    // Getting the audio
+                    Uri audioUri = data.getData();
+
+                    StringBuilder stringBuilder = new StringBuilder("action: ")
+                            .append(data.getAction())
+                            .append(" data: ")
+                            .append(data.getDataString())
+                            .append(" extras: ")
+                            ;
+                    for (String key : data.getExtras().keySet()){
+                        Log.i("Key",  key);
+                        Log.i("Value",  data.getExtras().get(key).toString());
+//                        stringBuilder.append(key).append("=").append(data.getExtras().get(key)).append(" ");
+                    }
+
+
+//                    Log.i("Data",  stringBuilder.toString());
 //                    ContentResolver contentResolver = getContentResolver();
 //                    try {
 //                        InputStream filestream = contentResolver.openInputStream(audioUri);
-//                        Toast.makeText( this, "audio" + "uri= "+ audioUri, Toast.LENGTH_LONG).show();
+////                        Toast.makeText( this, "audio" + "uri= "+ audioUri, Toast.LENGTH_LONG).show();
+//                        Log.i("audio uri=", audioUri.toString());
 //                    } catch (FileNotFoundException e) {
 //                        Toast.makeText( this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
 //                    }
@@ -101,10 +173,11 @@ public class AssistantActivity extends AppCompatActivity {
 
     }
 
-    private void postTask(String input) {
+    private String postTask(String input) {
         JsonObject taskDetails = new JsonObject();
+        String taskId = "";
 
-        taskDetails.addProperty("pool_id", "36641344");
+        taskDetails.addProperty("pool_id", "36673947");
         taskDetails.addProperty("overlap", 3);
 
         String json = "{\n" +
@@ -116,30 +189,87 @@ public class AssistantActivity extends AppCompatActivity {
 
         Log.i("Display", taskDetails.toString());
 
-        Call<List<TaskCreationResults>> call = RetrofitClient.getInstance("task").getTasksApi().sendTask(taskDetails);
-
-        call.enqueue(new Callback<List<TaskCreationResults>>() {
-            @Override
-            public void onResponse(Call<List<TaskCreationResults>> call, Response<List<TaskCreationResults>> response) {
-                List<TaskCreationResults> myheroList = response.body();
-                Log.i("Err", String.valueOf(myheroList));
-
-                String[] oneHeroes = new String[myheroList.size()];
-                Log.i("Pool Id", myheroList.get(0).getId());
-
-            }
-
-            @Override
-            public void onFailure(Call<List<TaskCreationResults>> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), "An error has occured", Toast.LENGTH_LONG).show();
-//                Log.i("Err", call[0].toString());
-            }
-
-        });
+        try
+        {
+            Call<TaskCreationResults> call = RetrofitClient.getInstance("task").getTasksApi().sendTask(taskDetails);
+            Response<TaskCreationResults> response = call.execute();
+            taskId = response.body().getId();
+//            Log.i("Task Id", taskId);
+//            return taskId;
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
 
 
-        return ;
+//        call.enqueue(new Callback<TaskCreationResults>() {
+//            @Override
+//            public void onResponse(Call<TaskCreationResults>call, Response<TaskCreationResults> response) {
+//                Log.i("Err0", response.body().toString());
+//                TaskCreationResults myheroList = ;
+//                Log.i("Err", String.valueOf(myheroList));
+//
+//
+//                taskId = myheroList.getId();
+//
+////                String[] oneHeroes = new String[myheroList.size()];
+////                Log.i("Pool Id", myheroList.get(0).getId());
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Call<TaskCreationResults> call, Throwable t) {
+//                Toast.makeText(getApplicationContext(), "An error has occured", Toast.LENGTH_LONG).show();
+////                Log.i("Err", call[0].toString());
+//            }
+//
+//        });
+
+        return taskId;
     }
+
+    private ArrayList<String> getTaskResults(String taskId) {
+//        Log.i("Tag", "Getting Task Results");
+        ArrayList<String> arrayOfAnswers = new ArrayList<>();
+        try
+        {
+            GetTaskResultsAPI api = RetrofitClientResults.getInstance().getTaskResultApi();
+            Log.i("APi Value", api.toString());
+            Call<TaskResults> call = api.getResults(36673947);
+            Response<TaskResults> response = call.execute();
+//            taskResults = response.body().get(0).getAnswer();
+            String currentTask = "";
+            for (JsonElement e :  response.body().getresults()) {
+
+                for(Map.Entry<String, JsonElement> entry : e.getAsJsonObject().entrySet()) {
+                    if (entry.getKey().equals("tasks")){
+                        Log.i("Key = ", entry.getKey());
+//                        Log.i("Is Array", String.valueOf(entry.getValue().isJsonArray())); // TRUE
+//                        Log.i("Is Object", String.valueOf(entry.getValue().isJsonObject()));
+                        entry.getValue().getAsJsonArray().get(0).getAsJsonObject().get("id");
+                        Log.i("Task Id", entry.getValue().getAsJsonArray().get(0).getAsJsonObject().get("id").getAsString());
+                        currentTask = entry.getValue().getAsJsonArray().get(0).getAsJsonObject().get("id").getAsString();
+                    }
+                    if (entry.getKey().equals("solutions")){
+                        if (currentTask.equals(taskId)){
+                            Log.i("Answer", entry.getValue().getAsJsonArray().get(0).getAsJsonObject().get("output_values").getAsJsonObject().get("result").getAsString());
+                            arrayOfAnswers.add(entry.getValue().getAsJsonArray().get(0).getAsJsonObject().get("output_values").getAsJsonObject().get("result").getAsString());
+                        }
+
+                    }
+                }
+            }
+//            return taskId;
+        } catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return arrayOfAnswers;
+    }
+
+
+
+
 
     private void getSuperHeroes() {
 //        poolConfigJson = getPoolConfigjson(121958);
