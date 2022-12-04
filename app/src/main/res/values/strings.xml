@@ -12,6 +12,7 @@
     <string name="FAQ">FAQ</string>
     <string name="Help">Help</string>
     <string name="title_activity_faq">FAQ</string>
+    <string name="send_recording">Send Recording</string>
 
     <string name="toggle_flash">Toggle Flash</string>
     <string name="scanned_data">Scanned Data</string>
@@ -21,4 +22,6 @@
     <string name="play_recording">Play Recording</string>
     <string name="stop_playing">Stop Playing</string>
     <string name="status">Status</string>
+
+    <string name="wait_status">Please Wait As We Fetch The Results</string>
 </resources>

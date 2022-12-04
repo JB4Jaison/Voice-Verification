@@ -3,6 +3,7 @@ package com.example.voiceverification;
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +38,9 @@ public class RecordingActivity extends AppCompatActivity {
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageRef = storage.getReference();
     FirebaseAuth mAuth;
+    Button sendButton;
     Uri file;
+    String audioUrl;
 
     private TextView startTV, stopTV, playTV, stopplayTV, statusTV;
 
@@ -66,7 +70,17 @@ public class RecordingActivity extends AppCompatActivity {
         stopTV.setBackgroundColor(getResources().getColor(R.color.gray));
         playTV.setBackgroundColor(getResources().getColor(R.color.gray));
         stopplayTV.setBackgroundColor(getResources().getColor(R.color.gray));
+        sendButton = findViewById(R.id.btnSend);
+        sendButton.setEnabled(false);
 
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), SendActivity.class);
+                i.putExtra("URL", audioUrl);
+                startActivity(i);
+            }
+        });
         startTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -277,6 +291,8 @@ public class RecordingActivity extends AppCompatActivity {
                                     public void onSuccess(Uri uri) {
                                         Uri downloadUrl = uri;
                                         Log.e("URL", downloadUrl.toString());
+                                        audioUrl = downloadUrl.toString();
+                                        sendButton.setEnabled(true);
                                     }
                                 });
 //                                Log.e("URL", audioRef.getDownloadUrl().toString());

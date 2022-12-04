@@ -103,4 +103,13 @@
             app:drawableTopCompat="@drawable/ic_pause_audio" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnSend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="600dp"
+        android:layout_marginLeft="200dp"
+        android:text="@string/send_recording"/>
+
 </RelativeLayout>
