@@ -2,16 +2,33 @@ package com.example.voiceverification;
 
 import android.content.Intent;
 import android.os.Bundle;
+
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.view.View;
+
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+
+import com.example.voiceverification.databinding.ActivityMainBinding;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+// import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.SearchView;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.ui.AppBarConfiguration;
-
-import com.example.voiceverification.databinding.ActivityMainBinding;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -24,6 +41,16 @@ public class MainActivity extends AppCompatActivity {
     Button categoryThree;
     Button categoryFour;
     private Intent packageContext;
+
+    Button LogInButton, RegisterButton ;
+    EditText Email, Password ;
+    String EmailHolder, PasswordHolder;
+    Boolean EditTextEmptyHolder;
+    SQLiteDatabase sqLiteDatabaseObj;
+    SQLiteHelper sqLiteHelper;
+    Cursor cursor;
+    String TempPassword = "NOT_FOUND" ;
+    public static final String UserEmail = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         return false;
     }
+
+
 
 
 }
