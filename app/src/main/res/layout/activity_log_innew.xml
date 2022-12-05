@@ -32,23 +32,36 @@
             android:layout_marginTop="20dp"
             android:id="@+id/editEmail"
             android:gravity="center"/>
+
         <EditText
+            android:id="@+id/editPassword"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:hint="Enter Password"
-            android:textColor="#000"
-            android:ems="10"
             android:layout_below="@+id/editEmail"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp"
-            android:id="@+id/editPassword"
-            android:gravity="center"/>
+            android:layout_marginTop="12dp"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="Enter Password"
+            android:inputType="textPassword"
+            android:textColor="#000" />
+        <EditText
+            android:id="@+id/editCountry"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/editPassword"
+            android:layout_marginTop="12dp"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="Enter Country"
+            android:inputType="text"
+            android:textColor="#000" />
+
+
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/buttonLogin"
-            android:layout_below="@+id/editPassword"
+            android:layout_below="@+id/editCountry"
             android:layout_marginTop="20dp"
             android:text="Sign In "/>
         <Button

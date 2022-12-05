@@ -15,8 +15,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 public class LogInnew extends AppCompatActivity {
     Button LogInButton, RegisterButton ;
-    EditText Email, Password ;
-    String EmailHolder, PasswordHolder;
+    EditText Email, Password, Country ;
+    String EmailHolder, PasswordHolder, CountryHolder;
     Boolean EditTextEmptyHolder;
     SQLiteDatabase sqLiteDatabaseObj;
     SQLiteHelper sqLiteHelper;
@@ -31,6 +31,8 @@ public class LogInnew extends AppCompatActivity {
         RegisterButton = (Button)findViewById(R.id.buttonRegister);
         Email = (EditText)findViewById(R.id.editEmail);
         Password = (EditText)findViewById(R.id.editPassword);
+        Country = (EditText)findViewById(R.id.editCountry);
+
         sqLiteHelper = new SQLiteHelper(this);
         //Adding click listener to log in button.
         LogInButton.setOnClickListener(new View.OnClickListener() {
@@ -81,6 +83,7 @@ public class LogInnew extends AppCompatActivity {
         // Getting value from All EditText and storing into String Variables.
         EmailHolder = Email.getText().toString();
         PasswordHolder = Password.getText().toString();
+        CountryHolder = Country.getText().toString();
         // Checking EditText is empty or no using TextUtils.
         if( TextUtils.isEmpty(EmailHolder) || TextUtils.isEmpty(PasswordHolder)){
             EditTextEmptyHolder = false ;
@@ -94,10 +97,11 @@ public class LogInnew extends AppCompatActivity {
         if(TempPassword.equalsIgnoreCase(PasswordHolder))
         {
             Toast.makeText(LogInnew.this,"Login Successful",Toast.LENGTH_LONG).show();
-            // Going to Dashboard activity after login success message.
-            Intent intent = new Intent(LogInnew.this, dashboard.class);
-            // Sending Email to Dashboard Activity using intent.
+            // Going to MainActivity activity after login success message.
+            Intent intent = new Intent(LogInnew.this, MainActivity.class);
+            // Sending Email to MainActivity Activity using intent.
             intent.putExtra(UserEmail, EmailHolder);
+            intent.putExtra("Countryid", CountryHolder);
             startActivity(intent);
         }
         else {

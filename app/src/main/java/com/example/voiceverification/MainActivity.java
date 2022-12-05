@@ -23,6 +23,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,11 +41,12 @@ public class MainActivity extends AppCompatActivity {
     Button categoryTwo;
     Button categoryThree;
     Button categoryFour;
+    ImageView settingsimage;
     private Intent packageContext;
 
     Button LogInButton, RegisterButton ;
     EditText Email, Password ;
-    String EmailHolder, PasswordHolder;
+    String EmailHolder, PasswordHolder, CountryHolder;
     Boolean EditTextEmptyHolder;
     SQLiteDatabase sqLiteDatabaseObj;
     SQLiteHelper sqLiteHelper;
@@ -53,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String UserEmail = "";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -63,42 +66,54 @@ public class MainActivity extends AppCompatActivity {
 
 //        setContentView(R.layout.home_screen);
         Button categoryOne = findViewById(R.id.button);
-//        Button categoryTwo = findViewById(R.id.button2);
-//        Button categoryThree = findViewById(R.id.button3);
-//        Button categoryFour = findViewById(R.id.button4);
+        Button categoryTwo = findViewById(R.id.buttonplace);
+        Button categoryThree = findViewById(R.id.buttonclothing);
+        Button categoryFour = findViewById(R.id.buttonpet);
+        ImageView settingsimage = findViewById(R.id.imageView);
+        Intent intent = getIntent();
+        // Receiving User Email Send By MainActivity.
+        EmailHolder = intent.getStringExtra(MainActivity.UserEmail);
+        CountryHolder = intent.getStringExtra("Countryid");
         categoryOne.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent1 = new Intent(MainActivity.this, AssistantActivity.class);
+                Intent intent1 = new Intent(MainActivity.this, RecordingActivity.class);
                 startActivity(intent1);
             }
         });
-//        categoryTwo.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent2 = new Intent(MainActivity.this, AssistantActivity.class);
-//                startActivity(intent2);
-//            }
-//        });
-//        categoryThree.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent3 = new Intent(MainActivity.this, AssistantActivity.class);
-//                startActivity(intent3);
-//            }
-//
-//        });
-//        categoryFour.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent4 = new Intent(MainActivity.this, AssistantActivity.class);
-//                startActivity(intent4);
-//            }
-//        });
+        settingsimage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent settingsintent = new Intent(MainActivity.this, Settings.class);
+                startActivity(settingsintent);
+            }
+        });
+        categoryTwo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent2 = new Intent(MainActivity.this, RecordingActivity.class);
+                startActivity(intent2);
+            }
+        });
+        categoryThree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent3 = new Intent(MainActivity.this, RecordingActivity.class);
+                startActivity(intent3);
+            }
+
+        });
+        categoryFour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent4 = new Intent(MainActivity.this, RecordingActivity.class);
+                startActivity(intent4);
+            }
+        });
 //        searchView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
-//                Intent intentSearch = new Intent(MainActivity.this, AssistantActivity.class);
+//                Intent intentSearch = new Intent(MainActivity.this, RecordingActivity.class);
 //                startActivity(intentSearch);
 //            }
 //        });
