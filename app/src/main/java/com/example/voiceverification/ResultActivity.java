@@ -2,7 +2,9 @@ package com.example.voiceverification;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,10 +20,17 @@ import retrofit2.Response;
 public class ResultActivity extends AppCompatActivity {
     String taskID;
     ListView resultListView;
+    Button tryAgain;
+    Button sendToAssistant;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
+
+        tryAgain = findViewById(R.id.tryAgainButton);
+        sendToAssistant = findViewById(R.id.sendToAssistant);
+        sendToAssistant.setEnabled(false);
 
         Intent data = getIntent();
         taskID = data.getStringExtra("taskId");
@@ -30,6 +39,14 @@ public class ResultActivity extends AppCompatActivity {
         ArrayList<String> answers = getTaskResults(taskID);
 
         resultListView.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, answers));
+
+        tryAgain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), RecordingActivity.class);
+                startActivity(i);
+            }
+        });
     }
 
     private ArrayList<String> getTaskResults(String taskId) {
@@ -37,7 +54,7 @@ public class ResultActivity extends AppCompatActivity {
         try
         {
             GetTaskResultsAPI api = RetrofitClientResults.getInstance().getTaskResultApi();
-            Call<TaskResults> call = api.getResults(36683946);
+            Call<TaskResults> call = api.getResults(36712129);
             Response<TaskResults> response = call.execute();
             String currentTask = "";
             for (JsonElement e :  response.body().getresults()) {

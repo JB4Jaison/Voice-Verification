@@ -28,6 +28,7 @@ public class SendActivity extends AppCompatActivity {
         setContentView(R.layout.activity_send);
 
         Intent data = getIntent();
+        postedTaskId = "0002302ec1--638e4b40ee7c335174bdfa4b";
         audioUrl = data.getStringExtra("URL");
         nDialog = findViewById(R.id.progressBar);
         nDialog.setIndeterminate(true);
@@ -35,10 +36,11 @@ public class SendActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        postedTaskId = postTask(audioUrl);
+//        postedTaskId = postTask(audioUrl);
+
         Log.i("Posted Task Id", postedTaskId);
 
-        new CountDownTimer(70000, 70000) {
+        new CountDownTimer(7000, 7000) {
             public void onFinish() {
                 Toast.makeText(getApplicationContext(), "The Results are ready!", Toast.LENGTH_LONG).show();
                 Intent results = new Intent(getApplicationContext(), ResultActivity.class);
@@ -56,7 +58,7 @@ public class SendActivity extends AppCompatActivity {
         JsonObject taskDetails = new JsonObject();
         String taskId = "";
 
-        taskDetails.addProperty("pool_id", "36683946");
+        taskDetails.addProperty("pool_id", "36712129");
         taskDetails.addProperty("overlap", 5);
 
         String json = "{\n" +
@@ -79,8 +81,6 @@ public class SendActivity extends AppCompatActivity {
         {
             ex.printStackTrace();
         }
-
-
         return taskId;
     }
 }

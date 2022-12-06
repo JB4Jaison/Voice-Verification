@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Results {
 
-    @SerializedName("name")
+    @SerializedName("transcription")
     private String superName;
 
 

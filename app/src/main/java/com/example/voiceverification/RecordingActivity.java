@@ -10,6 +10,9 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -33,6 +36,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class RecordingActivity extends AppCompatActivity {
     FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -41,8 +45,10 @@ public class RecordingActivity extends AppCompatActivity {
     Button sendButton;
     Uri file;
     String audioUrl;
+    Boolean use_cs;
+    Boolean Recording;
 
-    private TextView startTV, stopTV, playTV, stopplayTV, statusTV;
+    private TextView startTV, stopTV, playTV, stopplayTV, statusTV, speechText;
 
     // creating a variable for medi recorder object class.
     private MediaRecorder mRecorder;
@@ -67,11 +73,20 @@ public class RecordingActivity extends AppCompatActivity {
         stopTV = findViewById(R.id.btnStop);
         playTV = findViewById(R.id.btnPlay);
         stopplayTV = findViewById(R.id.btnStopPlay);
+
         stopTV.setBackgroundColor(getResources().getColor(R.color.gray));
         playTV.setBackgroundColor(getResources().getColor(R.color.gray));
         stopplayTV.setBackgroundColor(getResources().getColor(R.color.gray));
+
         sendButton = findViewById(R.id.btnSend);
+        speechText = findViewById(R.id.speechResult);
         sendButton.setEnabled(false);
+        stopTV.setVisibility(View.GONE);
+        stopTV.setEnabled(false);
+
+        use_cs = false;
+        Recording = false;
+
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,17 +96,35 @@ public class RecordingActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
         startTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Recording = true;
+                startTV.setVisibility(View.GONE);
+                startTV.setEnabled(false);
+                stopTV.setVisibility(View.VISIBLE);
+                stopTV.setEnabled(true);
                 // start recording method will
                 // start the recording of audio.
-                startRecording();
+                if (use_cs){
+                    startRecording();
+                } else {
+                    useRecognizer();
+//                    sendButton.setEnabled(false);
+                }
+
+
             }
         });
         stopTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Recording = false;
+                stopTV.setVisibility(View.GONE);
+                stopTV.setEnabled(false);
+                startTV.setVisibility(View.VISIBLE);
+                startTV.setEnabled(true);
                 // pause Recording method will
                 // pause the recording of audio.
                 pauseRecording();
@@ -117,6 +150,18 @@ public class RecordingActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
+        if (use_cs){
+            playTV.setVisibility(View.VISIBLE);
+            stopplayTV.setVisibility(View.VISIBLE);
+            speechText.setVisibility(View.GONE);
+            sendButton.setText("Send To Crowd");
+        } else {
+            statusTV.setVisibility(View.GONE);
+            playTV.setVisibility(View.GONE);
+            stopplayTV.setVisibility(View.GONE);
+            sendButton.setText("Send To Assistant");
+            useRecognizer();
+        }
 
     }
 
@@ -265,12 +310,6 @@ public class RecordingActivity extends AppCompatActivity {
         Log.e("URI", file.toString());
 
         FirebaseUser user = mAuth.getCurrentUser();
-//        if (user != null) {
-//
-//        } else {
-//            signInAnonymously(file);
-//        }
-
         mAuth.signInAnonymously().addOnSuccessListener(this, new  OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
@@ -322,6 +361,103 @@ public class RecordingActivity extends AppCompatActivity {
         playTV.setBackgroundColor(getResources().getColor(R.color.purple_200));
         stopplayTV.setBackgroundColor(getResources().getColor(R.color.gray));
         statusTV.setText("Recording Play Stopped");
+    }
+
+    private void useRecognizer(){
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,
+                "com.domain.app");
+
+        SpeechRecognizer recognizer = SpeechRecognizer
+                .createSpeechRecognizer(this.getApplicationContext());
+        RecognitionListener listener = new RecognitionListener() {
+            @Override
+            public void onResults(Bundle results) {
+                ArrayList<String> voiceResults = results
+                        .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                if (voiceResults == null) {
+                    System.out.println("No voice results");
+                } else {
+                    Log.i("Processing", "Printing matches: ");
+                    for (String match : voiceResults) {
+//                        System.out.println(match);
+                        Log.i("Results", match);
+                        speechText.setText(match);
+                    }
+                    sendButton.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void onReadyForSpeech(Bundle params) {
+//                System.out.println("Ready for speech");
+                Log.i("Status", "Ready for speech");
+            }
+
+            /**
+             *  ERROR_NETWORK_TIMEOUT = 1;
+             *  ERROR_NETWORK = 2;
+             *  ERROR_AUDIO = 3;
+             *  ERROR_SERVER = 4;
+             *  ERROR_CLIENT = 5;
+             *  ERROR_SPEECH_TIMEOUT = 6;
+             *  ERROR_NO_MATCH = 7;
+             *  ERROR_RECOGNIZER_BUSY = 8;
+             *  ERROR_INSUFFICIENT_PERMISSIONS = 9;
+             *
+             * @param error code is defined in SpeechRecognizer
+             */
+            @Override
+            public void onError(int error) {
+                System.err.println("Error listening for speech: " + error);
+            }
+
+            @Override
+            public void onBeginningOfSpeech() {
+//                System.out.println("Speech starting");
+                Toast.makeText(getApplicationContext(), "Speech Recording starting", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onBufferReceived(byte[] buffer) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onEndOfSpeech() {
+                // TODO Auto-generated method stub
+                Recording = false;
+                stopTV.setVisibility(View.GONE);
+                stopTV.setEnabled(false);
+                startTV.setVisibility(View.VISIBLE);
+                startTV.setEnabled(true);
+                Toast.makeText(getApplicationContext(), "Speech Recording Stopped", Toast.LENGTH_LONG).show();
+
+            }
+
+            @Override
+            public void onEvent(int eventType, Bundle params) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onPartialResults(Bundle partialResults) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onRmsChanged(float rmsdB) {
+                // TODO Auto-generated method stub
+
+            }
+        };
+        recognizer.setRecognitionListener(listener);
+        recognizer.startListening(intent);
     }
 
 
