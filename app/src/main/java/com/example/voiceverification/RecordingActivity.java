@@ -4,12 +4,14 @@ import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -84,7 +86,10 @@ public class RecordingActivity extends AppCompatActivity {
         stopTV.setVisibility(View.GONE);
         stopTV.setEnabled(false);
 
-        use_cs = false;
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+//        boolean isChecked =
+
+        use_cs = settings.getBoolean("switch", false);
         Recording = false;
 
 
@@ -110,6 +115,7 @@ public class RecordingActivity extends AppCompatActivity {
                 if (use_cs){
                     startRecording();
                 } else {
+                    Toast.makeText(getApplicationContext(), "Speech Recording starting", Toast.LENGTH_LONG).show();
                     useRecognizer();
 //                    sendButton.setEnabled(false);
                 }
@@ -369,24 +375,26 @@ public class RecordingActivity extends AppCompatActivity {
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,
                 "com.domain.app");
-
+//        Toast.makeText(getApplicationContext(), "Speech Recording starting", Toast.LENGTH_LONG).show();
         SpeechRecognizer recognizer = SpeechRecognizer
                 .createSpeechRecognizer(this.getApplicationContext());
         RecognitionListener listener = new RecognitionListener() {
             @Override
             public void onResults(Bundle results) {
+
                 ArrayList<String> voiceResults = results
                         .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
                 if (voiceResults == null) {
                     System.out.println("No voice results");
                 } else {
+                    Toast.makeText(getApplicationContext(), "Speech Recording stopped", Toast.LENGTH_LONG).show();
                     Log.i("Processing", "Printing matches: ");
                     for (String match : voiceResults) {
 //                        System.out.println(match);
                         Log.i("Results", match);
-                        speechText.setText(match);
+                        speechText.setText("Did you mean:" + match +"?");
                     }
-                    sendButton.setEnabled(true);
+//                    sendButton.setEnabled(true);
                 }
             }
 
@@ -417,7 +425,7 @@ public class RecordingActivity extends AppCompatActivity {
             @Override
             public void onBeginningOfSpeech() {
 //                System.out.println("Speech starting");
-                Toast.makeText(getApplicationContext(), "Speech Recording starting", Toast.LENGTH_LONG).show();
+
             }
 
             @Override
@@ -434,7 +442,7 @@ public class RecordingActivity extends AppCompatActivity {
                 stopTV.setEnabled(false);
                 startTV.setVisibility(View.VISIBLE);
                 startTV.setEnabled(true);
-                Toast.makeText(getApplicationContext(), "Speech Recording Stopped", Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(), "Speech Recording Stopped", Toast.LENGTH_LONG).show();
 
             }
 
