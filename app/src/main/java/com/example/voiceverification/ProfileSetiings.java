@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class ProfileSetiings extends AppCompatActivity {
     Button button1;
     Button buttonFAQ;
+    Button buttonHelp;
     private Intent packageContext;
 
 
@@ -18,9 +19,10 @@ public class ProfileSetiings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_setiings);
 
-        Button button1 = findViewById(R.id.button7);
+        button1 = findViewById(R.id.button7);
         Intent intent = getIntent();
-        Button buttonFAQ = findViewById(R.id.buttonfaq);
+        buttonFAQ = findViewById(R.id.buttonfaq);
+        buttonHelp = findViewById(R.id.buttonhelp);
 
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -34,6 +36,14 @@ public class ProfileSetiings extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent1 = new Intent(ProfileSetiings.this, FAQ.class);
+                startActivity(intent1);
+            }
+        });
+
+        buttonHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent1 = new Intent(ProfileSetiings.this, HelpActivity.class);
                 startActivity(intent1);
             }
         });

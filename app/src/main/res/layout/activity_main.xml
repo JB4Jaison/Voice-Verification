@@ -97,6 +97,7 @@
         android:text="Weather"
         app:layout_constraintBottom_toTopOf="@+id/buttonpet"
         app:layout_constraintEnd_toEndOf="@+id/buttonplace"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/buttonplace"
         app:layout_constraintTop_toBottomOf="@+id/buttonplace" />
 
@@ -110,6 +111,7 @@
         android:text="Pets"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/buttonclothing"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/buttonclothing"
         app:layout_constraintTop_toBottomOf="@+id/buttonclothing" />
 
